@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mimi Sữa - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #FFB6C1;
+            --secondary: #FFE4E1;
+            --accent: #FF69B4;
+            --text: #333;
+            --text-light: #666;
+            --bg: #FFFAF0;
+            --bg-light: #FFF5EE;
+            --border: #FFD1DC;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .header-left {
+            text-align: center;
+            flex: 1;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .header p {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .dark-mode-toggle {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            background: var(--secondary);
+            color: var(--accent);
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode-toggle:hover {
+            background: var(--primary);
+            transform: scale(1.1);
+        }
+
+        body.dark-mode {
+            color-scheme: dark;
+        }
+
+        /* Baby Profile Section */
+        .baby-profile {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.1);
+            border: 2px solid var(--border);
+        }
+
+        .baby-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .baby-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
+        }
+
+        .baby-info {
+            flex: 1;
+        }
+
+        .baby-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .baby-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .baby-detail-item {
+            background: var(--bg-light);
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .baby-detail-label {
+            color: var(--text-light);
+            font-weight: 600;
+            display: block;
+        }
+
+        .baby-detail-value {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .baby-edit-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .baby-edit-btn:hover {
+            background: #e75ba4;
+            transform: scale(1.05);
+        }
+
+        .total-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .total-ml {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .total-target {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .percentage {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: var(--secondary);
+            color: var(--accent);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            grid-column: 1 / -1;
+            font-size: 16px;
+            padding: 14px;
+        }
+
+        .btn-primary:hover {
+            background: #e75ba4;
+        }
+
+        .timeline {
+            border-left: 3px solid var(--border);
+            padding-left: 20px;
+            margin-top: 30px;
+        }
+
+        .timeline-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: var(--bg-light);
+            border-radius: 8px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -27px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 3px solid white;
+        }
+
+        .timeline-time {
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 14px;
+        }
+
+        .timeline-amount {
+            color: var(--text);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .timeline-notes {
+            color: var(--text-light);
+            font-size: 12px;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .timeline-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .timeline-item:hover .timeline-actions {
+            /* Hover effect removed - always visible */
+        }
+
+        .btn-small {
+            padding: 6px 10px;
+            font-size: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: var(--secondary);
+            color: var(--accent);
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .btn-small:hover {
+            background: var(--accent);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn-delete {
+            background: #FFB3BA;
+            color: #d32f2f;
+        }
+
+        .btn-delete:hover {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-light);
+        }
+
+        .empty-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.2s;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .form-group input {
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-modal {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-save {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #e75ba4;
+        }
+
+        .btn-cancel {
+            background: var(--secondary);
+            color: var(--accent);
+        }
+
+        .btn-cancel:hover {
+            background: var(--primary);
+        }
+
+        /* Chart Section */
+        .chart-section {
+            margin-top: 40px;
+            padding: 25px;
+            background: var(--secondary);
+            border-radius: 15px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 10px;
+        }
+
+        .chart-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        /* Insights Section */
+        .insights-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 15px;
+        }
+
+        .insights-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .insights-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .insight-item {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text);
+            border-left: 4px solid var(--accent);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #FF6B9D;
+                --secondary: #C71585;
+                --accent: #FF1493;
+                --text: #f0f0f0;
+                --text-light: #b0b0b0;
+                --bg: #1a1a1a;
+                --bg-light: #2d2d2d;
+                --border: #444;
+            }
+        }
+
+        /* Dark Mode - Pastel Purple Theme (Softer) */
+        body.dark-mode {
+            --primary: #E8D5F2;
+            --secondary: #DCC9ED;
+            --accent: #E2DDF9;
+            --text: #F8F6FB;
+            --text-light: #E0D7F2;
+            --bg: #4A3757;
+            --bg-light: #5A4767;
+            --border: #7A6787;
+        }
+
+        body.dark-mode .container {
+            background: var(--bg-light);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        body.dark-mode .modal-content {
+            background-color: var(--bg-light);
+        }
+
+        body.dark-mode .form-group input {
+            background-color: var(--bg);
+            color: var(--text);
+            border-color: var(--border);
+        }
+
+        body.dark-mode .stat-box {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+        }
+
+        body.dark-mode .timeline-item {
+            background: var(--bg-light);
+            border-color: var(--border);
+        }
+
+        body.dark-mode .btn-save:hover {
+            filter: brightness(1.2);
+        }
+
+        body.dark-mode .btn:hover {
+            filter: brightness(1.1);
+        }
+
+        body.dark-mode .insight-item {
+            background: var(--bg-light);
+            color: var(--text);
+            border-left-color: var(--accent);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>🍼 Mimi Sữa</h1>
+                <p id="date-today"></p>
+            </div>
+            <button id="darkModeToggle" class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+        </div>
+
+        <!-- Baby Profile Section -->
+        <div class="baby-profile">
+            <div class="baby-avatar" id="babyAvatar" onclick="openBabyModal()">👶</div>
+            <div class="baby-info">
+                <div class="baby-name" id="babyName">Bé Yêu</div>
+                <div class="baby-details">
+                    <div class="baby-detail-item">
+                        <span class="baby-detail-label">Tuổi</span>
+                        <span class="baby-detail-value" id="babyAge">0 tháng</span>
+                    </div>
+                    <div class="baby-detail-item">
+                        <span class="baby-detail-label">Chiều cao</span>
+                        <span class="baby-detail-value" id="babyHeight">-- cm</span>
+                    </div>
+                    <div class="baby-detail-item">
+                        <span class="baby-detail-label">Cân nặng</span>
+                        <span class="baby-detail-value" id="babyWeight">-- kg</span>
+                    </div>
+                </div>
+                <button class="baby-edit-btn" onclick="openBabyModal()">✏️ Chỉnh sửa</button>
+            </div>
+        </div>
+
+        <div class="total-section">
+            <div class="total-ml" id="total-ml">0</div>
+            <div class="total-target">/ 800ml</div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="percentage" id="percentage">0%</div>
+        </div>
+
+        <div class="quick-buttons">
+            <button class="btn" onclick="addQuickFeeding(60)">60ml</button>
+            <button class="btn" onclick="addQuickFeeding(90)">90ml</button>
+            <button class="btn" onclick="addQuickFeeding(120)">120ml</button>
+            <button class="btn" onclick="addQuickFeeding(150)">150ml</button>
+            <button class="btn btn-primary" onclick="showInputDialog()">➕ Thêm lượng khác</button>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-title">⏰ Chi tiết hôm nay</div>
+            <div id="timeline-container"></div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="chart-section">
+            <div class="chart-title">📊 Xu hướng 7 ngày gần nhất</div>
+            <div class="chart-container">
+                <canvas id="weekChart"></canvas>
+            </div>
+            <div class="chart-stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="avgDaily">0ml</div>
+                    <div class="stat-label">TB/ngày</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="successRate">0%</div>
+                    <div class="stat-label">Đạt mục tiêu</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Insights Section -->
+        <div class="insights-section">
+            <div class="insights-title">💡 Gợi ý thông minh</div>
+            <div class="insights-list" id="insightsList"></div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">✏️ Chỉnh sửa thông tin bú</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Thời gian (HH:MM)</label>
+                    <input type="time" id="editTime" />
+                </div>
+                <div class="form-group">
+                    <label>Lượng sữa (ml)</label>
+                    <input type="number" id="editAmount" min="0" max="300" />
+                </div>
+                <div class="form-group">
+                    <label>Ghi chú (tùy chọn)</label>
+                    <input type="text" id="editNotes" placeholder="nôn trớ, ngủ quên, ..." />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal btn-cancel" onclick="closeEditModal()">❌ Huỷ</button>
+                <button class="btn-modal btn-save" onclick="saveEdit()">💾 Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Baby Profile Modal -->
+    <div id="babyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">👶 Thông tin bé yêu</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Tên bé</label>
+                    <input type="text" id="babyNameInput" placeholder="Nhập tên bé..." />
+                </div>
+                <div class="form-group">
+                    <label>Avatar (emoji)</label>
+                    <input type="text" id="babyAvatarInput" maxlength="2" placeholder="👶" />
+                </div>
+                <div class="form-group">
+                    <label>Tuổi (tháng)</label>
+                    <input type="number" id="babyAgeInput" min="0" max="36" placeholder="0" />
+                </div>
+                <div class="form-group">
+                    <label>Chiều cao (cm)</label>
+                    <input type="number" id="babyHeightInput" min="0" max="200" placeholder="50" />
+                </div>
+                <div class="form-group">
+                    <label>Cân nặng (kg)</label>
+                    <input type="number" id="babyWeightInput" min="0" max="50" step="0.1" placeholder="3.5" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal btn-cancel" onclick="closeBabyModal()">❌ Huỷ</button>
+                <button class="btn-modal btn-save" onclick="saveBabyInfo()">💾 Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

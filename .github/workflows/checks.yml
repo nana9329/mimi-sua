@@ -1,0 +1,47 @@
+name: 🔍 Pre-Deploy Checks
+
+on:
+  pull_request:
+    branches: [main, deploy]
+  push:
+    branches: [main, deploy]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: ✅ Check Python syntax
+        run: |
+          python3 -m py_compile bot/bot.py
+          python3 -m py_compile bot/api.py
+          python3 -m py_compile bot/parser.py
+          python3 -m py_compile bot/database.py
+          echo "✅ Python files are valid"
+
+      - name: ✅ Check requirements.txt
+        run: |
+          [ -f bot/requirements.txt ] && echo "✅ requirements.txt exists" || exit 1
+
+      - name: ✅ Check Procfile
+        run: |
+          [ -f bot/Procfile ] && echo "✅ Procfile exists" || exit 1
+          grep -q "python bot.py" bot/Procfile && echo "✅ Procfile looks correct" || exit 1
+
+      - name: ✅ Check dashboard files
+        run: |
+          [ -f dashboard/index.html ] && echo "✅ index.html exists" || exit 1
+          [ -f dashboard/dashboard.js ] && echo "✅ dashboard.js exists" || exit 1
+          [ -f dashboard/netlify.toml ] && echo "✅ netlify.toml exists" || exit 1
+
+      - name: ✅ Check .env.example
+        run: |
+          [ -f bot/.env.example ] && echo "✅ .env.example exists" || exit 1
+          grep -q "TELEGRAM_BOT_TOKEN" bot/.env.example && echo "✅ Template has required vars" || exit 1
+
+      - name: 📝 Summary
+        run: |
+          echo "✅ All pre-deploy checks passed!"
+          echo "Ready to deploy when PR is merged."
