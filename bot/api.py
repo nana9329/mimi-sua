@@ -25,7 +25,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Path to bot data
-BOT_DATA_PATH = "../bot/data/feedings.json"
+BOT_DATA_PATH = "data/feedings.json"
 
 def get_feedings():
     """Đọc file feedings.json từ Bot"""
